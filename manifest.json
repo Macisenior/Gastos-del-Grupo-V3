@@ -1,11 +1,20 @@
 {
-  "name": "Gastos del Grupo",
-  "short_name": "Gastos",
-  "start_url": "/Cafes-festivos/",
-  "scope": "/Cafes-festivos/",
+  "id": "/Gastos-del-Grupo-V3/",
+
+ "name": "Gastos del Grupo DEV",
+
+  "short_name": "Gastos DEV",
+
+  "start_url": "/Gastos-del-Grupo-V3/",
+
+  "scope": "/Gastos-del-Grupo-V3/",
+
   "display": "standalone",
+
   "background_color": "#ffffff",
+
   "theme_color": "#4CAF50",
+
   "icons": [
     {
       "src": "./icon-192.png",
@@ -13,7 +22,7 @@
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

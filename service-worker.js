@@ -1,4 +1,4 @@
-const CACHE_NAME = "gastos-grupo-v1"
+const CACHE_NAME = "gastos-grupo-v3"
 const FILES_TO_CACHE = [
   "./",
   "./index.html",

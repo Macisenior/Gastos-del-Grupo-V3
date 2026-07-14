@@ -19,6 +19,9 @@ const heroUpdate = document.getElementById("heroUpdate");
       total === 0 ? "#555" :
       "#1b5e20";
   }
+if (heroGrupo) {
+    heroGrupo.textContent = obtenerNombreGrupo(grupoActivo);
+}
 let estado = "positivo";
 
 if (total < 20) {

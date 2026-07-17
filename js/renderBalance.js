@@ -82,8 +82,8 @@ export function renderBalance(personas, gastos) {
     }
 
     return `
-
-      <div class="estado-card ${clase}"
+<div class="estado-card ${clase}"
+    onclick="mostrarDetallePersona('${index}')"
            style="
               border-left-color:${tema.color};
               --card-color:${tema.fondo};

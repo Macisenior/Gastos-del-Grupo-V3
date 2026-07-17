@@ -37,42 +37,22 @@ import {
   seleccionarTodosRapido,
   renderSitiosRapido 
 } from "./rapido.js";
+import { renderDetallePersona } from "./renderDetallePersona.js";
 //import { abrirAdministrador } from "./admin.js";
 window.enviarGastoRapido = enviarGastoRapido;
 window.seleccionarTodosRapido = seleccionarTodosRapido;
-console.log("APP JS CARGADO");
+
 
 function render() {
-
-  const totalRestante = document.getElementById("heroMensaje");
-  const heroBalance = document.getElementById("heroBalance");
-  const sitiosContainer = document.getElementById("sitiosContainer");
-  const checkboxPersonas = document.getElementById("checkboxPersonas");
-  const personaEfectivo = document.getElementById("personaEfectivo");
-  const heroInfo = document.getElementById("heroInfo");
-const pinCard = document.getElementById("pinCard");
-const modoEdicion = document.getElementById("modoEdicion");
-const dangerZone = document.getElementById("dangerZone");
-const adminCard = document.getElementById("adminCard");
-  // ===== HERO FRASE =====
-  //if (totalRestante) {
- // totalRestante.classList.add("frase-animada");
-
-   // setTimeout(() => {
-      //totalRestante.innerHTML = fraseActual;
-
-    //  if (estadoActual === "negativo") {
-    //    totalRestante.style.background = "rgba(229,57,53,0.08)";
-   //   } else if (estadoActual === "bajo") {
-      //  totalRestante.style.background = "rgba(255,193,7,0.12)";
-    //  } else {
-      //  totalRestante.style.background = "rgba(76,175,80,0.08)";
-    //  }
-
-      totalRestante.classList.remove("frase-animada");
-  // }, 200);
- // }
-
+ 
+  const personaEfectivo = document.getElementById("personaEfectivo");  
+  const pinCard = document.getElementById("pinCard");
+  const modoEdicion = document.getElementById("modoEdicion");
+  const dangerZone = document.getElementById("dangerZone");
+  const adminCard = document.getElementById("adminCard");
+ 
+    
+ 
   // ===== SITIOS =====
  renderSitios(listaSitios);
 renderSitiosRapido(listaSitios);
@@ -465,7 +445,6 @@ function calcularMovimientosDesdeInicio(personaId, fecha) {
 
 // 🔥 FUNCIÓN FINAL (LA BUENA)
 function calcularSaldoEnFecha(personaId, fecha) {
-
   const saldoHoy = calcularSaldoActual(personaId);
   const movimientos = calcularMovimientosDesdeInicio(personaId, fecha);
 
@@ -477,6 +456,8 @@ function calcularSaldoEnFecha(personaId, fecha) {
   return saldoInicial + movimientos;
 
 }
+window.calcularSaldoEnFecha = calcularSaldoEnFecha;
+
 window.verEstadoEnFecha = function() {
 
   const input = document.getElementById("fechaConsulta");
@@ -484,7 +465,7 @@ window.verEstadoEnFecha = function() {
     alert("Selecciona una fecha");
     return;
   }
-
+window.calcularSaldoEnFecha = calcularSaldoEnFecha;
   const fecha = new Date(input.value);
   const cont = document.getElementById("estadoFechaCard");
 
@@ -765,7 +746,7 @@ function tiempoDesde(fecha) {
   return fecha.toLocaleDateString();
 }
 function crearBackupLocal() {
-console.log("🛟 Backup local automático ejecutado"); //
+
   const backup = {
     _backup: {
       app: "Gastos de grupo",
@@ -829,9 +810,9 @@ function cargar(){
 } else {
   ultimaActualizacion = null;
 }
-  console.log("SNAPSHOT");
-console.log("Grupo:", grupoActivo);
-console.log("Personas:", personas.map(p => p.nombre));
+  
+
+
 console.log("Usuario actual:", localStorage.getItem("usuarioActual"));   
     } 
 render();
@@ -1042,10 +1023,14 @@ function agregarPersona() {
 window.agregarPersona = agregarPersona;
 
 window.añadirEfectivo = async () => {
-  const p = personas.find(p => p.id == personaEfectivo.value);
-  const amount = +efectivoExtra.value;
-  const date = cashDate.value;
-console.log("➕ Añadiendo efectivo");
+
+    const personaEfectivo = document.getElementById("personaEfectivo");
+    const efectivoExtra = document.getElementById("efectivoExtra");
+    const cashDate = document.getElementById("cashDate");
+
+    const p = personas.find(p => p.id == personaEfectivo.value);
+    const amount = +efectivoExtra.value;
+    const date = cashDate.value;
   if (!p || !amount || !date) {
     alert("Faltan datos");
     return;
@@ -1126,7 +1111,7 @@ window.repararIdsAportaciones = async function () {
 
   });
 
-  console.log("Aportaciones reparadas:", reparadas);
+  
 
   await guardar();
 
@@ -1137,7 +1122,7 @@ window.repararIdsAportaciones = async function () {
 };
 window.agregarGasto = async () => {
 
-    console.log("Entró en agregarGasto", gastoEditando);
+  
 
     // ===== Participantes =====
 
@@ -1219,7 +1204,7 @@ window.agregarGasto = async () => {
         titulo.textContent = "💳 Añadir gasto";
     }
 
-    console.log("Va a guardar");
+   
 
     await guardar();
 
@@ -1273,7 +1258,7 @@ document.querySelectorAll(".sitio-chip").forEach(btn => {
   });
 });  
 
- console.log("RENDER");
+
 const heroInfo = document.getElementById("heroInfo");
 const grupoSelect = document.getElementById("selectorGrupo");
 if (grupoSelect) {
@@ -1295,12 +1280,14 @@ if (btnTodos && btnLimpiar) {
     document.querySelectorAll("#checkboxPersonas input").forEach(c => {
       c.checked = true;
     });
+     actualizarContadorGasto(); 
   };
 
   btnLimpiar.onclick = () => {
     document.querySelectorAll("#checkboxPersonas input").forEach(c => {
       c.checked = false;
     });
+      actualizarContadorGasto();
   };
 
 }
@@ -1620,7 +1607,7 @@ window.actualizarNombresGrupos = async function () {
     emoji: "🥓"
   }, { merge: true });
 
-  console.log("✅ Grupos actualizados correctamente");
+
 };
  
 window.exportarResumenFinal = () =>
@@ -1841,8 +1828,7 @@ function editarGasto(id) {
 
     if (!gasto) return;
 
-    console.log("Editando:", gasto);
-
+   
     gastoEditando = gasto;
     document.getElementById("pantallaAdminGastos").style.display = "none";
 document.getElementById("pantallaPrincipal").style.display = "block";
@@ -1987,3 +1973,17 @@ function iniciarAplicacion() {
 }
 
 window.iniciarAplicacion = iniciarAplicacion;
+window.mostrarDetallePersona = function(index) {
+
+    const persona = personas[index];
+
+    mostrarPantalla("pantallaDetallePersona");
+
+    renderDetallePersona(
+        persona,
+        personas,
+        gastos,
+        aportaciones
+    );
+
+};

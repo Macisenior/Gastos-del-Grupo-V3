@@ -128,7 +128,9 @@
       <button id="btnTodos" type="button">Todos</button>
       <button id="btnLimpiar" type="button">Limpiar</button>
     </div>
-
+<div id="contadorGasto" class="contador-participantes">
+    👥 0 de 11 seleccionados
+</div>
     <div id="checkboxPersonas"></div>
 
     <input id="montoGasto" type="number" placeholder="Importe €">
@@ -639,6 +641,9 @@ if ("serviceWorker" in navigator) {
 
 <select id="rapidoSitio"></select>
 <input id="rapidoMonto" placeholder="Importe">
+<div id="contadorParticipantes" class="contador-participantes">
+    👥 0 de 11 seleccionados
+</div>
 
 <button onclick="seleccionarTodosRapido()">Seleccionar todos</button>
 
@@ -648,5 +653,28 @@ if ("serviceWorker" in navigator) {
   📲 Enviar por WhatsApp
 </button>
 
+</div>
+<!-- ====================================================== -->
+<!-- PANTALLA DETALLE PERSONA -->
+<!-- ====================================================== -->
+
+<div id="pantallaDetallePersona" class="pantalla">
+
+    <div class="cabecera-pantalla">
+        <button onclick="volverPrincipal()">
+            ⬅ Volver
+        </button>
+
+        <h2>👤 Detalle del saldo</h2>
+    </div>
+
+    <div id="detallePersonaContenido">
+
+        Cargando...
+
+    </div>
+
+</div>
 </body>
+
 </html>

@@ -24,7 +24,7 @@ export function renderPersonasRapido(personas) {
   `).join("");
 }
 const TELEFONO_ADMIN = "34607256271";
-
+actualizarContadorParticipantes();
 // ===== TOGGLE SELECCIÓN =====
 window.togglePersonaRapido = function(id, el) {
 
@@ -37,7 +37,12 @@ window.togglePersonaRapido = function(id, el) {
     el.style.background = "#4CAF50";
     el.style.color = "white";
   }
+  actualizarContadorParticipantes();
 };
+
+
+actualizarContadorParticipantes();
+
 
 
 // ===== SELECCIONAR TODOS =====
@@ -119,5 +124,31 @@ document.querySelectorAll(".persona-btn").forEach(el => {
   el.style.background = "#f5f5f5";
   el.style.color = "#000";
 });
+actualizarContadorParticipantes();
 document.getElementById("rapidoPagador").selectedIndex = 0;
 };
+function actualizarContadorParticipantes() {
+console.log(document.querySelectorAll(".persona-btn").length);
+  const total = document.querySelectorAll(".persona-btn").length;
+  const seleccionados = document.querySelectorAll(".persona-btn.activo").length;
+
+  const contador = document.getElementById("contadorParticipantes");
+  if (!contador) return;
+
+  if (seleccionados === 0) {
+
+    contador.textContent = `👥 0 de ${total} seleccionados`;
+
+  } else if (seleccionados === total) {
+
+    contador.textContent = `✅ Todos seleccionados (${total})`;
+
+  } else {
+
+    contador.textContent =
+      `👥 ${seleccionados} de ${total} seleccionados`;
+
+  }
+
+}
+actualizarContadorParticipantes();

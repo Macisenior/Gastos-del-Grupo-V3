@@ -7,7 +7,8 @@ export function renderPersonas(personas) {
 
   checkboxPersonas.innerHTML = "";
   personaEfectivo.innerHTML = "";
-
+personaEfectivo.innerHTML =
+    `<option value="">👤 Selecciona una persona...</option>`;
   personas.forEach(p => {
     checkboxPersonas.innerHTML += `
       <label class="persona-chip">

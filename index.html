@@ -271,11 +271,60 @@
   color:white;
   cursor:pointer;
 ">
-  Ver histórico
+ Ver histórico
 </button>
-  <div id="resumenContenido"></div>
+<div class="card">
 
+    <h2>🌍 Informes globales</h2>
+
+    <p class="admin-subtitulo">
+        Consulta el estado económico de todos los grupos en una fecha.
+    </p>
+
+    <input
+        type="date"
+        id="fechaGlobal">
+
+    <button
+        class="admin-btn admin-morado"
+        onclick="consultarEstadoGlobal()">
+
+        📅 Consultar estado global
+
+    </button>
+    <h3>📅 Histórico entre fechas</h3>
+
+<input type="date" id="fechaDesde">
+
+<input type="date" id="fechaHasta">
+
+<button onclick="exportarHistoricoDesdeUI()">
+    📊 Exportar histórico
+</button>
+<button
+    class="admin-btn admin-verde"
+    onclick="exportarEstadoGlobalExcel()">
+
+    📊 Exportar Excel
+
+</button>
+<button
+    class="admin-btn admin-verde"
+    onclick="exportarHistoricoGlobalDesdeUI()">
+
+    🌍 Exportar evolución global
+
+</button>
+    <div id="resultadoGlobal"
+         style="margin-top:20px">
+    </div>
 </div>
+
+ 
+  <div id="resumenContenido"></div>
+</div>
+
+
 <!-- PANTALLA GASTOS -->
 <!-- ================================================= -->
 <!-- PANTALLA GASTOS -->
@@ -615,7 +664,9 @@
     </div>
 
 </div> 
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
+<script type="module" src="./js/app.js"></script>
  
 <script type="module" src="./js/app.js"></script>
 

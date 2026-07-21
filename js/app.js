@@ -38,6 +38,28 @@ import {
   renderSitiosRapido 
 } from "./rapido.js";
 import { renderDetallePersona } from "./renderDetallePersona.js";
+
+import {
+    consultarEstadoGlobal,
+    exportarEstadoGlobalExcel,
+    exportarHistorico,
+     exportarHistoricoGlobal
+} from "./historicos.js";
+window.exportarEstadoGlobalExcel =
+    exportarEstadoGlobalExcel;
+window.consultarEstadoGlobal = () => {
+  document.getElementById("fechaGlobal").min = "2026-05-01";
+
+    const fecha = document.getElementById("fechaGlobal").value;
+
+    if (!fecha) {
+        alert("Selecciona una fecha");
+        return;
+    }
+
+    consultarEstadoGlobal(fecha);
+
+};
 //import { abrirAdministrador } from "./admin.js";
 window.enviarGastoRapido = enviarGastoRapido;
 window.seleccionarTodosRapido = seleccionarTodosRapido;
@@ -396,68 +418,123 @@ function filtrarPorMes(gastos, mes, año) {
   });
 }
 const FECHA_INICIO = new Date("2026-04-01");
+// 🔥 calcular saldo actual (válida para cualquier grupo)
+function calcularSaldoActual(
+    personaId,
+    personasGrupo = personas,
+    gastosGrupo = gastos
+) {
 
-// 🔥 calcular saldo actual (como tu pantalla real)
-function calcularSaldoActual(personaId) {
+    let gastado = 0;
 
-  let gastado = 0;
+    gastosGrupo.forEach(g => {
 
-  gastos.forEach(g => {
-    if (!g.participantes || !g.monto) return;
+        if (!g.participantes || !g.monto) return;
 
-    if (g.participantes.map(id => Number(id)).includes(Number(personaId))) {
-      gastado += g.monto / g.participantes.length;
-    }
-  });
+        if (
+            (g.participantes || [])
+                .map(Number)
+                .includes(Number(personaId))
+        ) {
+            gastado += g.monto / g.participantes.length;
+        }
 
-  const p = personas.find(x => x.id === personaId);
-  return (p.aportado || 0) - gastado;
+    });
+
+    const persona = personasGrupo.find(
+        p => Number(p.id) === Number(personaId)
+    );
+
+    return (persona?.aportado || 0) - gastado;
+
 }
-
 // 🔥 calcular saldo desde abril (solo movimientos)
-function calcularMovimientosDesdeInicio(personaId, fecha) {
+function calcularMovimientosDesdeInicio(
+    personaId,
+    fecha,
+    aportacionesGrupo = aportaciones,
+    gastosGrupo = gastos
+) {
 
-  let aportado = 0;
-  let gastado = 0;
+    let aportado = 0;
+    let gastado = 0;
 
-  aportaciones.forEach(a => {
-    const f = new Date(a.date);
-    if (f >= FECHA_INICIO && f <= fecha && a.personaId === personaId) {
-      aportado += a.amount;
-    }
-  });
+    // ===== APORTACIONES =====
+    aportacionesGrupo.forEach(a => {
 
-  gastos.forEach(g => {
+        const f = new Date(a.date);
 
-    if (!g.fecha) return;
+        if (
+            f >= FECHA_INICIO &&
+            f <= fecha &&
+            Number(a.personaId) === Number(personaId)
+        ) {
+            aportado += a.amount;
+        }
 
-    const [d, m, y] = g.fecha.split("/");
-    const f = new Date(`${y}-${m}-${d}`);
+    });
 
-    if (f >= FECHA_INICIO && f <= fecha && g.participantes.includes(personaId)) {
-      gastado += g.monto / g.participantes.length;
-    }
+    // ===== GASTOS =====
+    gastosGrupo.forEach(g => {
 
-  });
+        if (!g.fecha) return;
 
-  return aportado - gastado;
+        const [d, m, y] = g.fecha.split("/");
+
+        const f = new Date(`${y}-${m}-${d}`);
+
+        if (
+            f >= FECHA_INICIO &&
+            f <= fecha &&
+            (g.participantes || []).map(Number).includes(Number(personaId))
+        ) {
+            gastado += g.monto / g.participantes.length;
+        }
+
+    });
+
+    return aportado - gastado;
+
 }
+// 🔥 FUNCIÓN UNIVERSAL
+function calcularSaldoEnFecha(
+    personaId,
+    fecha,
+    personasGrupo = personas,
+    gastosGrupo = gastos,
+    aportacionesGrupo = aportaciones
+) {
 
-// 🔥 FUNCIÓN FINAL (LA BUENA)
-function calcularSaldoEnFecha(personaId, fecha) {
-  const saldoHoy = calcularSaldoActual(personaId);
-  const movimientos = calcularMovimientosDesdeInicio(personaId, fecha);
+    // Saldo actual del grupo que estemos usando
+    const saldoHoy = calcularSaldoActual(
+        personaId,
+        personasGrupo,
+        gastosGrupo
+    );
 
-  // 🔥 clave: restar lo que ha pasado desde abril hasta esa fecha
-  const movimientosHoy = calcularMovimientosDesdeInicio(personaId, new Date());
+    // Movimientos hasta la fecha consultada
+    const movimientosFecha = calcularMovimientosDesdeInicio(
+        personaId,
+        fecha,
+        aportacionesGrupo,
+        gastosGrupo
+    );
 
-  const saldoInicial = saldoHoy - movimientosHoy;
+    // Movimientos hasta hoy
+    const movimientosHoy = calcularMovimientosDesdeInicio(
+        personaId,
+        new Date(),
+        aportacionesGrupo,
+        gastosGrupo
+    );
 
-  return saldoInicial + movimientos;
+    // Saldo inicial del periodo
+    const saldoInicial = saldoHoy - movimientosHoy;
+
+    return saldoInicial + movimientosFecha;
 
 }
 window.calcularSaldoEnFecha = calcularSaldoEnFecha;
-
 window.verEstadoEnFecha = function() {
 
   const input = document.getElementById("fechaConsulta");
@@ -1035,7 +1112,21 @@ window.añadirEfectivo = async () => {
     alert("Faltan datos");
     return;
   }
+// Comprobar si ya existe un ingreso para esa persona en esa fecha
+const yaExiste = aportaciones.some(a =>
+    a.personaId === p.id &&
+    a.date === date
+);
 
+if (yaExiste) {
+
+    const continuar = confirm(
+        `⚠️ ${p.nombre} ya tiene un ingreso registrado el ${date}.\n\n¿Quieres añadir otro ingreso?`
+    );
+
+    if (!continuar) return;
+
+}
   // sumar al total de la persona
   p.aportado += amount;
 
@@ -1566,7 +1657,7 @@ function mostrarPantalla(id) {
         pantalla.classList.add("activa");
     }
 }
-
+window.mostrarPantalla = mostrarPantalla;
 window.volverPrincipal = function () {
 
     mostrarPantalla("pantallaPrincipal");
@@ -1789,9 +1880,19 @@ window.abrirAdministrador = abrirAdministrador;
 
 window.pedirPinAdmin = () => {
 
+    // Ya está desbloqueado durante esta sesión
+    if (sessionStorage.getItem("adminOK") === "true") {
+
+        abrirAdministrador();
+        return;
+
+    }
+
     const pin = prompt("🔑 Introduce el PIN de administrador");
 
     if (pin === pinGuardado) {
+
+        sessionStorage.setItem("adminOK", "true");
 
         abrirAdministrador();
 
@@ -1985,5 +2086,40 @@ window.mostrarDetallePersona = function(index) {
         gastos,
         aportaciones
     );
+
+};
+window.exportarHistoricoDesdeUI = () => {
+
+    const desde = document.getElementById("fechaDesde").value;
+    const hasta = document.getElementById("fechaHasta").value;
+
+    if (!desde || !hasta) {
+        alert("Selecciona las dos fechas.");
+        return;
+    }
+
+    exportarHistorico(desde, hasta);
+
+};
+window.exportarHistoricoGlobalDesdeUI = () => {
+
+    const desde = document.getElementById("fechaDesde").value;
+    const hasta = document.getElementById("fechaHasta").value;
+
+    if (!desde || !hasta) {
+        alert("Selecciona las dos fechas.");
+        return;
+    }
+
+    exportarHistoricoGlobal(desde, hasta);
+
+};
+window.cerrarSesionAdmin = () => {
+
+    sessionStorage.removeItem("adminOK");
+
+    alert("🔒 Administrador bloqueado.");
+
+    mostrarPantalla("pantallaPrincipal");
 
 };

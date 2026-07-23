@@ -666,7 +666,7 @@
 </div> 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<script type="module" src="./js/app.js"></script>
+
  
 <script type="module" src="./js/app.js"></script>
 
@@ -722,6 +722,29 @@ if ("serviceWorker" in navigator) {
     <div id="detallePersonaContenido">
 
         Cargando...
+
+    </div>
+
+</div>
+<!-- Modal detalle gasto -->
+
+<div id="modalDetalleGasto" class="modal oculto">
+
+    <div class="modal-contenido">
+
+   <div id="contenidoDetalleGasto"></div>
+
+<div class="modal-botones">
+
+    <button
+        class="boton-secundario"
+        onclick="cerrarDetalleGasto()">
+
+        Cerrar
+
+    </button>
+
+</div>
 
     </div>
 

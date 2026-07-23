@@ -6,6 +6,7 @@
             "Albergue": "🛏",
             "Pignatelli": "🏛"
         };
+    import { verDetalleGasto } from "./detalleGasto.js";    
 export function renderGastos(gastos, personas, filtrarPorMes) {
 
     const listaGastos = document.getElementById("listaGastos");
@@ -62,7 +63,9 @@ export function renderGastos(gastos, personas, filtrarPorMes) {
 
         return `
 
-<div class="usuario-card gasto-card">
+<div
+    class="usuario-card gasto-card"
+    onclick="verDetalleGasto('${g.id}')">
 
     <div class="usuario-avatar">
         ${icono}
@@ -92,7 +95,7 @@ export function renderGastos(gastos, personas, filtrarPorMes) {
 
         <button
             class="rojo"
-            onclick="eliminarGasto('${g.id}')">
+            onclick="event.stopPropagation(); eliminarGasto('${g.id}')">
 
             🗑
 

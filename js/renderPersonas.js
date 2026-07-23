@@ -1,3 +1,5 @@
+import { mostrarPanelConsumiciones } from "./consumiciones.js";
+
 export function renderPersonas(personas) {
 
   const checkboxPersonas = document.getElementById("checkboxPersonas");
@@ -26,7 +28,9 @@ personaEfectivo.innerHTML =
     `;
   });
  actualizarContadorGasto(); 
+
 }
+
 function actualizarContadorGasto() {
 
     const total =
@@ -54,6 +58,15 @@ function actualizarContadorGasto() {
 
         contador.textContent =
             `👥 ${seleccionados} de ${total} seleccionados`;
+const personasSeleccionadas = [...document.querySelectorAll("#checkboxPersonas input:checked")]
+    .map(chk => ({
+        id: chk.value,
+        nombre: chk.nextElementSibling.textContent
+    }));
+
+mostrarPanelConsumiciones(personasSeleccionadas);
+console.log("Panel de consumiciones");
+console.log(personasSeleccionadas);
 
     }
 }

@@ -45,6 +45,11 @@ import {
     exportarHistorico,
      exportarHistoricoGlobal
 } from "./historicos.js";
+import {
+    limpiarConsumiciones,
+    obtenerConsumiciones
+} from "./consumiciones.js";
+
 window.exportarEstadoGlobalExcel =
     exportarEstadoGlobalExcel;
 window.consultarEstadoGlobal = () => {
@@ -73,8 +78,9 @@ function render() {
   const dangerZone = document.getElementById("dangerZone");
   const adminCard = document.getElementById("adminCard");
  
-    
- 
+   window.gastos = gastos;
+window.personas = personas; 
+console.log("RENDER", gastos.length);
   // ===== SITIOS =====
  renderSitios(listaSitios);
 renderSitiosRapido(listaSitios);
@@ -134,6 +140,7 @@ if (resumenPersonas) {
 }
 
 // ===== LISTA GASTOS =====
+
 renderGastos(gastos, personas, filtrarPorMes);
 const buscarGasto = document.getElementById("buscarGasto");
 
@@ -242,7 +249,7 @@ let fraseActual = "";
 let unsubscribeGrupo = null;
 let cargandoGrupo = false;
 let usuarioEditando = null;
-
+let pinAdmin = "864291";
  
   console.log("Intentando login anónimo...");
   signInAnonymously(auth).catch(console.error);
@@ -985,18 +992,29 @@ window.pedirPin = async () => {
   // ===== PEDIR PIN =====
   const intento = prompt("Introduce el PIN");
 
-  if (String(intento) === String(pinGuardado)) {
+if (String(intento) === String(pinAdmin)) {
+
+    activarEdicion();
+
+    sessionStorage.setItem("adminOK", "true");
+
+    abrirAdministrador();
+
+    return;
+
+}
+
+if (String(intento) === String(pinGuardado)) {
 
     activarEdicion();
 
     render();
 
-  } else {
+    return;
 
-    alert("PIN incorrecto");
+}
 
-  }
-
+alert("PIN incorrecto");
 };
 function bloquearEdicion() {
 
@@ -1272,12 +1290,14 @@ window.agregarGasto = async () => {
             descripcion: descripcion || "cafes",
             monto,
             participantes: part,
+            consumiciones: obtenerConsumiciones(), 
             fecha
 
         });
 
     }
-
+// Limpiar consumiciones para el siguiente gasto
+limpiarConsumiciones();
     // ===== Restaurar modo normal =====
 
     gastoEditando = null;

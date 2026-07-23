@@ -18,36 +18,48 @@ export function renderActividadReciente(persona, personas, gastos, aportaciones)
 
     const diferencia = saldoHoy - saldoAyer;
 
-    // =============================
-    // Gastos últimos 3 días
-    // =============================
+  // =============================
+// Gastos últimos 3 días
+// =============================
 
-    const limite = new Date();
-    limite.setDate(hoy.getDate() - 3);
+const limite = new Date();
+limite.setDate(hoy.getDate() - 3);
 
-    const gastosRecientes = [];
+const gastosRecientes = [];
 
-    gastos.forEach(gasto => {
+gastos.forEach(gasto => {
 
-        if (!gasto.participantes.includes(persona.id)) return;
+    if (!gasto.participantes.includes(persona.id)) return;
 
-        const fecha = convertirFecha(gasto.fecha);
+    const fecha = convertirFecha(gasto.fecha);
 
-        if (fecha < limite) return;
+    if (fecha < limite) return;
 
-        gastosRecientes.push({
+    // Calcular importe según consumiciones
+    const pesos = gasto.consumiciones || {};
 
-            fecha,
-            sitio: gasto.sitio || "",
-            descripcion: gasto.descripcion || "",
-            importe: gasto.monto / gasto.participantes.length
+    let totalPesos = 0;
 
-        });
+    gasto.participantes.forEach(id => {
+        totalPesos += pesos[id] || 1;
+    });
+
+    const miPeso = pesos[persona.id] || 1;
+
+    const importe = gasto.monto * miPeso / totalPesos;
+
+    gastosRecientes.push({
+
+        fecha,
+        sitio: gasto.sitio || "",
+        descripcion: gasto.descripcion || "",
+        importe
 
     });
 
-    gastosRecientes.sort((a, b) => b.fecha - a.fecha);
+});
 
+gastosRecientes.sort((a, b) => b.fecha - a.fecha);
     // =============================
     // Últimos ingresos
     // =============================

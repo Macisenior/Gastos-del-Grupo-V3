@@ -94,3 +94,24 @@ export function calcularRepartoGasto(gasto, personas) {
     return resultado;
 
 }
+export function calcularImportePersonaEnGasto(gasto, personaId) {
+
+    if (!gasto.participantes?.includes(personaId)) return 0;
+
+    // Si no hay consumiciones → reparto clásico
+    if (!gasto.consumiciones) {
+        return gasto.monto / gasto.participantes.length;
+    }
+
+    const pesos = gasto.consumiciones;
+
+    let totalPesos = 0;
+
+    gasto.participantes.forEach(id => {
+        totalPesos += pesos[id] || 1;
+    });
+
+    const miPeso = pesos[personaId] || 1;
+
+    return gasto.monto * miPeso / totalPesos;
+}

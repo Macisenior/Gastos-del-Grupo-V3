@@ -38,7 +38,7 @@ import {
   renderSitiosRapido 
 } from "./rapido.js";
 import { renderDetallePersona } from "./renderDetallePersona.js";
-
+import { calcularImportePersonaEnGasto } from "./services/calculos.js";
 import {
     consultarEstadoGlobal,
     exportarEstadoGlobalExcel,
@@ -443,7 +443,7 @@ function calcularSaldoActual(
                 .map(Number)
                 .includes(Number(personaId))
         ) {
-            gastado += g.monto / g.participantes.length;
+            gastado += calcularImportePersonaEnGasto(g, personaId);
         }
 
     });
@@ -495,7 +495,7 @@ function calcularMovimientosDesdeInicio(
             f <= fecha &&
             (g.participantes || []).map(Number).includes(Number(personaId))
         ) {
-            gastado += g.monto / g.participantes.length;
+            gastado += calcularImportePersonaEnGasto(g, personaId);
         }
 
     });

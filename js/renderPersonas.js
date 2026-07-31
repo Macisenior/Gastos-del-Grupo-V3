@@ -64,9 +64,6 @@ const personasSeleccionadas = [...document.querySelectorAll("#checkboxPersonas i
         nombre: chk.nextElementSibling.textContent
     }));
 
-mostrarPanelConsumiciones(personasSeleccionadas);
-console.log("Panel de consumiciones");
-console.log(personasSeleccionadas);
 
     }
 }

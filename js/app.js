@@ -17,7 +17,8 @@ import { renderResumen } from "./resumen.js";
 import {
     calcularGastoPorPersona,
     calcularBalance
-} from "./services/calculos.js";
+}
+from "./calculos.js";
 import { renderSitios } from "./renderSitios.js";
 import { renderPersonas } from "./renderPersonas.js";
 import { renderGastos } from "./renderGastos.js";
@@ -38,7 +39,7 @@ import {
   renderSitiosRapido 
 } from "./rapido.js";
 import { renderDetallePersona } from "./renderDetallePersona.js";
-import { calcularImportePersonaEnGasto } from "./services/calculos.js";
+import { calcularImportePersonaEnGasto } from "./calculos.js";
 import {
     consultarEstadoGlobal,
     exportarEstadoGlobalExcel,
@@ -49,7 +50,12 @@ import {
     limpiarConsumiciones,
     obtenerConsumiciones
 } from "./consumiciones.js";
-
+import {
+    iniciarModosGasto,
+    obtenerModoGasto,
+    obtenerImportesPersona
+} from "./modosGasto.js";
+iniciarModosGasto();
 window.exportarEstadoGlobalExcel =
     exportarEstadoGlobalExcel;
 window.consultarEstadoGlobal = () => {
@@ -80,7 +86,7 @@ function render() {
  
    window.gastos = gastos;
 window.personas = personas; 
-console.log("RENDER", gastos.length);
+
   // ===== SITIOS =====
  renderSitios(listaSitios);
 renderSitiosRapido(listaSitios);
@@ -251,7 +257,7 @@ let cargandoGrupo = false;
 let usuarioEditando = null;
 let pinAdmin = "864291";
  
-  console.log("Intentando login anónimo...");
+ 
   signInAnonymously(auth).catch(console.error);
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -259,7 +265,7 @@ onAuthStateChanged(auth, async (user) => {
     const loading = document.getElementById("loading");
     if (loading) loading.style.display = "block";
 
-    console.log("Auth OK", user.uid);
+   
 
     await new Promise(resolve => setTimeout(resolve, 1500));
     await cargarListaGrupos();
@@ -862,7 +868,7 @@ function crearBackupLocal() {
   a.download = nombre;
   a.click();
 
-  console.log("📦 Backup local creado:", nombre);
+
 }
 function cargar(){
 
@@ -897,7 +903,7 @@ function cargar(){
   
 
 
-console.log("Usuario actual:", localStorage.getItem("usuarioActual"));   
+ 
     } 
 render();
    
@@ -941,7 +947,7 @@ async function guardar() {
   }
 
   try {
-  console.log("📦 ENVIANDO A FIRESTORE");  
+
   await setDoc(
   getDocRef(),
   {
@@ -954,7 +960,7 @@ async function guardar() {
   { merge: true }
 );
 
-    console.log("✅ Guardado seguro en Firestore");
+  
   } catch (e) {
     console.error("❌ Error al guardar:", e);
   }
@@ -1177,7 +1183,6 @@ window.eliminarGasto = async function(id) {
   // 🔥 refrescar UI
   render();
 
-  console.log("Gasto eliminado correctamente");
 
 };
 window.eliminarAportacion = async function(id) {
@@ -1242,6 +1247,9 @@ window.agregarGasto = async () => {
         alert("Selecciona al menos un participante");
         return;
     }
+const modo = obtenerModoGasto();
+
+const importesPersona = obtenerImportesPersona();
 
     // ===== Sitio =====
 
@@ -1256,20 +1264,32 @@ window.agregarGasto = async () => {
         return;
     }
 
+
     // ===== Datos =====
 
-    const descripcion = document.getElementById("descripcionGasto").value.trim();
+const descripcion = document.getElementById("descripcionGasto").value.trim();
 
-    const monto = +document.getElementById("montoGasto").value;
+let monto;
 
-    const fecha = document.getElementById("fechaGasto").value
-        ? new Date(document.getElementById("fechaGasto").value).toLocaleDateString()
-        : new Date().toLocaleDateString();
+if (modo === "importe") {
 
-    if (!monto || monto <= 0) {
-        alert("Introduce un importe válido");
-        return;
-    }
+    monto = Object.values(importesPersona)
+        .reduce((a, b) => a + b, 0);
+
+} else {
+
+    monto = +document.getElementById("montoGasto").value;
+
+}
+
+const fecha = document.getElementById("fechaGasto").value
+    ? new Date(document.getElementById("fechaGasto").value).toLocaleDateString()
+    : new Date().toLocaleDateString();
+
+if (!monto || monto <= 0) {
+    alert("Introduce un importe válido");
+    return;
+}
 
     // ===== NUEVO O EDITAR =====
 
@@ -1280,21 +1300,40 @@ window.agregarGasto = async () => {
         gastoEditando.monto = monto;
         gastoEditando.participantes = part;
         gastoEditando.fecha = fecha;
+        gastoEditando.modo = modo;
+
+gastoEditando.importesPersona =
+    modo === "importe"
+        ? importesPersona
+        : null;
 
     } else {
 
-        gastos.push({
+      gastos.push({
 
-            id: Date.now(),
-            sitio: sitioSeleccionado,
-            descripcion: descripcion || "cafes",
-            monto,
-            participantes: part,
-            consumiciones: obtenerConsumiciones(), 
-            fecha
+    id: Date.now(),
 
-        });
+    sitio: sitioSeleccionado,
 
+    descripcion: descripcion || "cafes",
+
+    monto,
+
+    participantes: part,
+
+    consumiciones: obtenerConsumiciones(),
+
+    // NUEVO
+    modo,
+
+    importesPersona:
+        modo === "importe"
+            ? importesPersona
+            : null,
+
+    fecha
+
+}); 
     }
 // Limpiar consumiciones para el siguiente gasto
 limpiarConsumiciones();

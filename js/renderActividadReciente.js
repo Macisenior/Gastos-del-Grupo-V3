@@ -1,3 +1,4 @@
+import { calcularImportePersonaEnGasto } from "./calculos.js";
 export function renderActividadReciente(persona, personas, gastos, aportaciones) {
 
     const hoy = new Date();
@@ -35,18 +36,10 @@ gastos.forEach(gasto => {
 
     if (fecha < limite) return;
 
-    // Calcular importe según consumiciones
-    const pesos = gasto.consumiciones || {};
-
-    let totalPesos = 0;
-
-    gasto.participantes.forEach(id => {
-        totalPesos += pesos[id] || 1;
-    });
-
-    const miPeso = pesos[persona.id] || 1;
-
-    const importe = gasto.monto * miPeso / totalPesos;
+    const importe = calcularImportePersonaEnGasto(
+        gasto,
+        persona.id
+    );
 
     gastosRecientes.push({
 

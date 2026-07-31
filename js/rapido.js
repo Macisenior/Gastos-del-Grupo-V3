@@ -128,7 +128,7 @@ actualizarContadorParticipantes();
 document.getElementById("rapidoPagador").selectedIndex = 0;
 };
 function actualizarContadorParticipantes() {
-console.log(document.querySelectorAll(".persona-btn").length);
+
   const total = document.querySelectorAll(".persona-btn").length;
   const seleccionados = document.querySelectorAll(".persona-btn.activo").length;
 

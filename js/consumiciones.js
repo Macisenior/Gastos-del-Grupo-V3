@@ -1,5 +1,6 @@
 // ============================================
 // CONSUMICIONES
+// V3.1
 // ============================================
 
 let consumiciones = {};
@@ -8,68 +9,66 @@ export function inicializarConsumiciones() {
     consumiciones = {};
 }
 
-export function mostrarPanelConsumiciones(personasSeleccionadas) {
+// ============================================
+// DIBUJAR PANEL DE CONSUMICIONES
+// ============================================
+export function mostrarPanelConsumiciones(panel, personasSeleccionadas) {
 
-  let panel = document.getElementById("panelConsumiciones");
+    panel.innerHTML = "";
 
-if (!panel) {
+    if (!personasSeleccionadas.length) {
+        panel.innerHTML = `
+            <p style="text-align:center;color:#777;">
+                Selecciona participantes
+            </p>
+        `;
+        return;
+    }
 
-    panel = document.createElement("div");
-    panel.id = "panelConsumiciones";
-
-    document.getElementById("checkboxPersonas")
-        .insertAdjacentElement("afterend", panel);
-
-}
-
-panel.innerHTML = "";
-if (!personasSeleccionadas.length) {
-    panel.style.display = "none";
-    return;
-}
-
-panel.style.display = "block";
-
-panel.innerHTML = `
-    <h3>🍺 Consumiciones</h3>
-`;
-personasSeleccionadas.forEach(p => {
-
-    panel.innerHTML += `
-        <div class="fila-consumicion">
-
-            <span>${p.nombre}</span>
-
-         <button
-    type="button"
-    data-id="${p.id}"
-    onclick="cambiarConsumicion(this)">
-    ${consumiciones[p.id] > 1 ? "×" + consumiciones[p.id] : "+"}
-</button>  
-
-        </div>
+    panel.innerHTML = `
+        <h3>🍺 Consumiciones</h3>
     `;
 
-});
+    personasSeleccionadas.forEach(p => {
+
+        panel.innerHTML += `
+            <div class="fila-consumicion">
+
+                <span>${p.nombre}</span>
+
+                <button
+                    type="button"
+                    data-id="${p.id}"
+                    onclick="cambiarConsumicion(this)">
+                    ${consumiciones[p.id] > 1 ? "×" + consumiciones[p.id] : "+"}
+                </button>
+
+            </div>
+        `;
+
+    });
+
 }
 
+// ============================================
+// OBTENER CONSUMICIONES
+// ============================================
 export function obtenerConsumiciones() {
     return consumiciones;
 }
 
+// ============================================
+// LIMPIAR CONSUMICIONES
+// ============================================
 export function limpiarConsumiciones() {
 
     consumiciones = {};
 
-    const panel = document.getElementById("panelConsumiciones");
-
-    if (panel) {
-        panel.innerHTML = "";
-        panel.style.display = "none";
-    }
-
 }
 
+// ============================================
+// CAMBIAR CONSUMICIÓN
+// ============================================
 export function cambiarConsumicion(boton) {
 
     let n = consumiciones[boton.dataset.id] || 1;
@@ -83,4 +82,5 @@ export function cambiarConsumicion(boton) {
     boton.textContent = n === 1 ? "+" : "×" + n;
 
 }
+
 window.cambiarConsumicion = cambiarConsumicion;

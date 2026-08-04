@@ -7,16 +7,24 @@
             "Pignatelli": "🏛"
         };
     import { verDetalleGasto } from "./detalleGasto.js";    
+
 export function renderGastos(gastos, personas, filtrarPorMes) {
 
     const listaGastos = document.getElementById("listaGastos");
     if (!listaGastos) return;
 
-    const hoy = new Date();
+   const fecha = new Date();
+
+const mesMostrar =
+    window.mesVisualizado ?? fecha.getMonth();
+
+const añoMostrar =
+    window.añoVisualizado ?? fecha.getFullYear();
+
     const gastosVisibles = filtrarPorMes(
         gastos,
-        hoy.getMonth(),
-        hoy.getFullYear()
+        mesMostrar,
+        añoMostrar
     );
 
     const buscador = document.getElementById("buscarGasto");
@@ -51,6 +59,7 @@ export function renderGastos(gastos, personas, filtrarPorMes) {
         });
 
     listaGastos.innerHTML = lista.map(g => {
+    
 
         const nombres = g.participantes
             .map(id => personas.find(p => p.id === id)?.nombre || "");

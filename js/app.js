@@ -55,6 +55,8 @@ import {
     obtenerModoGasto,
     obtenerImportesPersona
 } from "./modosGasto.js";
+import { renderHistoricoGastos } from "./gastosHistoricos.js";
+import { seleccionarModo } from "./modosGasto.js";
 iniciarModosGasto();
 window.exportarEstadoGlobalExcel =
     exportarEstadoGlobalExcel;
@@ -256,7 +258,7 @@ let unsubscribeGrupo = null;
 let cargandoGrupo = false;
 let usuarioEditando = null;
 let pinAdmin = "864291";
- 
+
  
   signInAnonymously(auth).catch(console.error);
 onAuthStateChanged(auth, async (user) => {
@@ -1337,49 +1339,62 @@ gastoEditando.importesPersona =
     }
 // Limpiar consumiciones para el siguiente gasto
 limpiarConsumiciones();
-    // ===== Restaurar modo normal =====
 
-    gastoEditando = null;
+// ===== Restaurar modo normal =====
 
-    const btn = document.getElementById("btnAgregarGasto");
+gastoEditando = null;
 
-    if (btn) {
-        btn.textContent = "Añadir gasto";
-        btn.style.background = "orange";
-    }
+const btn = document.getElementById("btnAgregarGasto");
 
-    const titulo = document.querySelector(".card.editable h2");
+if (btn) {
+    btn.textContent = "Añadir gasto";
+    btn.style.background = "orange";
+}
 
-    if (titulo) {
-        titulo.textContent = "💳 Añadir gasto";
-    }
+const titulo = document.querySelector(".card.editable h2");
 
-   
+if (titulo) {
+    titulo.textContent = "💳 Añadir gasto";
+}
 
-    await guardar();
+await guardar();
 
-    render();
+// ===== Limpiar formulario =====
 
-    // ===== Limpiar formulario =====
+document.getElementById("montoGasto").value = "";
 
-    document.getElementById("montoGasto").value = "";
+document.getElementById("descripcionGasto").value = "cafes";
 
-    document.getElementById("descripcionGasto").value = "cafes";
+const hoy = new Date().toISOString().split("T")[0];
 
-    const hoy = new Date().toISOString().split("T")[0];
+document.getElementById("fechaGasto").value = hoy;
 
-    document.getElementById("fechaGasto").value = hoy;
+const fechaIngreso = document.getElementById("cashDate");
 
-    const fechaIngreso = document.getElementById("cashDate");
+if (fechaIngreso) fechaIngreso.value = hoy;
 
-    if (fechaIngreso) fechaIngreso.value = hoy;
+document
+    .querySelectorAll("#checkboxPersonas input")
+    .forEach(cb => cb.checked = false);
 
-    document
-        .querySelectorAll("#checkboxPersonas input")
-        .forEach(cb => cb.checked = false);
+document.getElementById("sitioManual").value = "";
 
-    document.getElementById("sitioManual").value = "";
+// Volver al modo inicial
+seleccionarModo("igual");
+render();
+document
+    .querySelectorAll("#selectorModoGasto .modo")
+    .forEach(btn => btn.classList.remove("activo"));
 
+document
+    .querySelector('#selectorModoGasto .modo[data-modo="igual"]')
+    ?.classList.add("activo");
+
+// Limpiar el panel inferior
+// Volver al modo inicial
+seleccionarModo("igual");
+
+render();
 };
 window.actualizarTelefono = async (id, valor) => {
 
@@ -2182,3 +2197,28 @@ window.cerrarSesionAdmin = () => {
     mostrarPantalla("pantallaPrincipal");
 
 };
+function abrirHistoricos() {
+
+    mostrarPantalla("pantallaHistoricos");
+
+    renderHistoricoGastos(gastos);
+    
+
+}
+
+window.abrirMesHistorico = function (clave) {
+
+    const [año, mes] = clave.split("-");
+
+    window.mesVisualizado = Number(mes) - 1;
+    window.añoVisualizado = Number(año);
+mostrarPantalla("pantallaAdminGastos");
+
+    render();
+
+};
+document
+    .getElementById("btnHistoricos")
+    .addEventListener("click", abrirHistoricos);
+
+window.abrirHistoricos = abrirHistoricos;
